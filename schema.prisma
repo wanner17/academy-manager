@@ -1,11 +1,23 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "mysql"
-  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  password     String
+  role         String   // TEACHER | ASSISTANT
+  createdById  Int?
+  createdBy    User?    @relation("CreatedBy", fields: [createdById], references: [id])
+  createdUsers User[]   @relation("CreatedBy")
+  assignedTodos Todo[]
+  schedules    Schedule[]
+  createdAt    DateTime @default(now())
 }
 
 // 학생 정보
@@ -34,7 +46,7 @@ model Attendance {
   studentId Int
   student   Student  @relation(fields: [studentId], references: [id])
   date      DateTime
-  status    String   // PRESENT(출석), ABSENT(결석), LATE(지각) 등
+  status    String   // PRESENT(출석), ABSENT(결석), LATE(지각)
 }
 
 // 수업 일정
@@ -44,15 +56,18 @@ model Schedule {
   start     DateTime
   end       DateTime
   room      String?
-  teacherId String
+  teacherId Int
+  teacher   User     @relation(fields: [teacherId], references: [id])
 }
 
 // 업무 관리 (To-do List)
 model Todo {
-  id          Int      @id @default(autoincrement())
-  content     String
-  isCompleted Boolean  @default(false)
-  category    String   // COMMON(전체), TEACHER(강사), ASSISTANT(조교)
-  updatedBy   String?  // 마지막으로 수정한 사람 이름
-  updatedAt   DateTime @updatedAt
+  id           Int      @id @default(autoincrement())
+  content      String
+  isCompleted  Boolean  @default(false)
+  category     String   // COMMON(전체), TEACHER(강사), ASSISTANT(조교)
+  assignedToId Int?
+  assignedTo   User?    @relation(fields: [assignedToId], references: [id])
+  updatedBy    String?
+  updatedAt    DateTime @updatedAt
 }
