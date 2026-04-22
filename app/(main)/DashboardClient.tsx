@@ -7,6 +7,7 @@ import type { SessionData } from "@/app/lib/session";
 type Todo = {
   id: number;
   content: string;
+  detail: string | null;
   isCompleted: boolean;
   category: string;
   updatedBy: string | null;
@@ -42,6 +43,7 @@ export default function DashboardClient({
   users: User[];
 }) {
   const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
   const [todoState, todoAction, todoPending] = useActionState(createTodo, undefined);
   const [, startTransition] = useTransition();
   const isTeacher = session.role === "TEACHER";
@@ -90,7 +92,7 @@ export default function DashboardClient({
                     pendingTodos.map((todo) => (
                       <div key={todo.id} className="flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-xl shadow-sm">
                         <input type="checkbox" className="mt-1 w-4 h-4 cursor-pointer" defaultChecked={false} onChange={() => handleToggle(todo.id)} />
-                        <div className="flex-1">
+                        <div className="flex-1 cursor-pointer" onClick={() => setSelectedTodo(todo)}>
                           <p className="font-semibold text-gray-900 text-sm">{todo.content}</p>
                           <p className="text-xs text-gray-500 mt-1">
                             담당: {todo.updatedBy || "미지정"} · {new Date(todo.updatedAt).toLocaleDateString("ko-KR")}
@@ -115,7 +117,7 @@ export default function DashboardClient({
                     completedTodos.map((todo) => (
                       <div key={todo.id} className="flex items-start gap-3 p-3 bg-white border border-gray-200 rounded-xl shadow-sm">
                         <input type="checkbox" className="mt-1 w-4 h-4 cursor-pointer" defaultChecked onChange={() => handleToggle(todo.id)} />
-                        <p className="font-semibold text-gray-500 text-sm line-through">{todo.content}</p>
+                        <p className="font-semibold text-gray-500 text-sm line-through cursor-pointer" onClick={() => setSelectedTodo(todo)}>{todo.content}</p>
                       </div>
                     ))
                   )}
@@ -138,9 +140,9 @@ export default function DashboardClient({
                 <p className="text-sm text-gray-500 text-center py-10">오늘 할 일이 없습니다!</p>
               ) : (
                 pendingTodos.map((todo) => (
-                  <div key={todo.id} className="flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:border-blue-300 transition-colors cursor-pointer">
+                  <div key={todo.id} className="flex items-start gap-4 p-4 bg-white border border-gray-200 rounded-xl shadow-sm hover:border-blue-300 transition-colors">
                     <input type="checkbox" className="mt-1 w-5 h-5 cursor-pointer" defaultChecked={false} onChange={() => handleToggle(todo.id)} />
-                    <div className="flex-1">
+                    <div className="flex-1 cursor-pointer" onClick={() => setSelectedTodo(todo)}>
                       <p className="font-bold text-gray-900">{todo.content}</p>
                       <p className="text-xs text-gray-500 mt-1">담당: {todo.updatedBy || "미지정"}</p>
                     </div>
@@ -202,6 +204,34 @@ export default function DashboardClient({
         </section>
       </div>
 
+      {/* 상세 보기 모달 */}
+      {selectedTodo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setSelectedTodo(null)}>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+              <h3 className="text-lg font-bold text-gray-900">업무 상세</h3>
+              <button onClick={() => setSelectedTodo(null)} className="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <p className="text-xs font-semibold text-gray-400 mb-1">제목</p>
+                <p className={`text-base font-semibold text-gray-900 ${selectedTodo.isCompleted ? "line-through text-gray-400" : ""}`}>{selectedTodo.content}</p>
+              </div>
+              {selectedTodo.detail && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 mb-1">상세 내용</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedTodo.detail}</p>
+                </div>
+              )}
+              <div className="flex gap-4 text-sm text-gray-500 pt-2 border-t border-gray-100">
+                <span>담당: {selectedTodo.updatedBy || "미지정"}</span>
+                <span>{new Date(selectedTodo.updatedAt).toLocaleDateString("ko-KR")}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 새 업무 지시 모달 */}
       {isTaskModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -215,13 +245,22 @@ export default function DashboardClient({
             <form action={todoAction}>
               <div className="p-6 space-y-5">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">업무 내용</label>
-                  <textarea
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">제목</label>
+                  <input
                     name="content"
-                    rows={3}
+                    type="text"
                     required
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="업무 제목을 입력하세요"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">상세 내용 (선택)</label>
+                  <textarea
+                    name="detail"
+                    rows={3}
                     className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                    placeholder="지시할 업무 내용을 입력하세요..."
+                    placeholder="상세 내용을 입력하세요"
                   />
                 </div>
                 <div>

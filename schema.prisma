@@ -64,6 +64,7 @@ model Schedule {
 model Todo {
   id           Int      @id @default(autoincrement())
   content      String
+  detail       String?
   isCompleted  Boolean  @default(false)
   category     String   // COMMON(전체), TEACHER(강사), ASSISTANT(조교)
   assignedToId Int?

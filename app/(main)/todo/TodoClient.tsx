@@ -8,6 +8,7 @@ type User = { id: number; name: string; role: string };
 type Todo = {
   id: number;
   content: string;
+  detail: string | null;
   isCompleted: boolean;
   category: string;
   updatedBy: string | null;
@@ -39,6 +40,7 @@ export default function TodoClient({
 }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
   const [state, action, pending] = useActionState(createTodo, undefined);
   const [, startTransition] = useTransition();
 
@@ -125,7 +127,7 @@ export default function TodoClient({
                   </svg>
                 )}
               </button>
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 cursor-pointer" onClick={() => setSelectedTodo(todo)}>
                 <p className={`text-sm text-gray-800 ${todo.isCompleted ? "line-through text-gray-400" : ""}`}>
                   {todo.content}
                 </p>
@@ -156,6 +158,42 @@ export default function TodoClient({
         )}
       </div>
 
+      {/* 상세 보기 모달 */}
+      {selectedTodo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setSelectedTodo(null)}>
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden" onClick={(e) => e.stopPropagation()}>
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+              <h3 className="text-lg font-bold text-gray-900">업무 상세</h3>
+              <button onClick={() => setSelectedTodo(null)} className="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <p className="text-xs font-semibold text-gray-400 mb-1">제목</p>
+                <p className={`text-base font-semibold text-gray-900 ${selectedTodo.isCompleted ? "line-through text-gray-400" : ""}`}>{selectedTodo.content}</p>
+              </div>
+              {selectedTodo.detail && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-400 mb-1">상세 내용</p>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedTodo.detail}</p>
+                </div>
+              )}
+              <div className="flex gap-2 flex-wrap">
+                <span className={`px-2 py-0.5 rounded-md text-xs font-semibold border ${CATEGORY_COLOR[selectedTodo.category]}`}>
+                  {CATEGORY_LABEL[selectedTodo.category]}
+                </span>
+                {selectedTodo.assignedTo && (
+                  <span className="text-xs text-gray-500">→ {selectedTodo.assignedTo.name}</span>
+                )}
+              </div>
+              <div className="flex gap-4 text-sm text-gray-500 pt-2 border-t border-gray-100">
+                <span>작성: {selectedTodo.updatedBy || "미지정"}</span>
+                <span>{new Date(selectedTodo.updatedAt).toLocaleDateString("ko-KR")}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 업무 추가 모달 */}
       {isAddOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
@@ -172,13 +210,22 @@ export default function TodoClient({
             <form action={action}>
               <div className="p-6 space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">업무 내용</label>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">제목</label>
                   <input
                     name="content"
                     type="text"
                     required
-                    placeholder="업무 내용을 입력하세요"
+                    placeholder="업무 제목을 입력하세요"
                     className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">상세 내용 (선택)</label>
+                  <textarea
+                    name="detail"
+                    rows={3}
+                    placeholder="상세 내용을 입력하세요"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                   />
                 </div>
                 <div>

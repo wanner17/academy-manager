@@ -11,15 +11,16 @@ export async function createTodo(state: ActionState, formData: FormData): Promis
   if (!session || session.role !== "TEACHER") return { error: "권한이 없습니다." };
 
   const content = formData.get("content") as string;
+  const detail = formData.get("detail") as string | null;
   const category = formData.get("category") as string;
   const assignedToIdStr = formData.get("assignedToId") as string;
   const assignedToId = assignedToIdStr ? parseInt(assignedToIdStr) : null;
 
-  if (!content || !category) return { error: "내용과 분류를 입력해주세요." };
+  if (!content || !category) return { error: "제목과 분류를 입력해주세요." };
   if (!["COMMON", "TEACHER", "ASSISTANT"].includes(category)) return { error: "올바른 분류를 선택해주세요." };
 
   await prisma.todo.create({
-    data: { content, category, assignedToId: assignedToId || null, updatedBy: session.name },
+    data: { content, detail: detail || null, category, assignedToId: assignedToId || null, updatedBy: session.name },
   });
 
   revalidatePath("/todo");
