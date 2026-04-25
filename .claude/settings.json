@@ -8,7 +8,8 @@
       "Bash(node -e \"const {PrismaClient} = require\\('@prisma/client'\\); const p = new PrismaClient\\(\\); console.log\\(Object.keys\\(p\\).filter\\(k => !k.startsWith\\('_'\\)\\)\\)\")",
       "Bash(node -e \"const {PrismaClient} = require\\('@prisma/client'\\); console.log\\('user' in PrismaClient.prototype\\)\")",
       "Bash(node -e \"const {PrismaClient} = require\\('@prisma/client'\\); console.log\\('user in prototype:', 'user' in PrismaClient.prototype\\)\")",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(npx tsc *)"
     ]
   }
 }

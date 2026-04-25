@@ -51,6 +51,9 @@ export default function Sidebar({ session }: { session: SessionData }) {
           <Link href="/students" onClick={() => setIsOpen(false)} className="block px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors">
             학생 관리
           </Link>
+          <Link href="/progress" onClick={() => setIsOpen(false)} className="block px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors">
+            진도 관리
+          </Link>
           <Link href="/schedule" onClick={() => setIsOpen(false)} className="block px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors">
             주간 일정표
           </Link>
