@@ -56,15 +56,15 @@ export default function DashboardClient({
   const completedTodos = todos.filter((t) => t.isCompleted);
 
   return (
-    <main className="p-8">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 tracking-tight">대시보드</h1>
+    <main className="p-4 sm:p-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-2">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 tracking-tight">대시보드</h1>
         <div className="text-sm text-gray-500">
           {new Date().toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric", weekday: "long" })}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 sm:gap-8">
         {/* 할일 섹션 */}
         {isTeacher ? (
           <section className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden flex flex-col h-[440px]">
@@ -169,7 +169,7 @@ export default function DashboardClient({
                 <thead className="bg-gray-50 border-b border-gray-200 sticky top-0">
                   <tr>
                     <th className="px-4 py-3 font-semibold text-gray-600">이름</th>
-                    <th className="px-4 py-3 font-semibold text-gray-600">학교/학년</th>
+                    <th className="px-4 py-3 font-semibold text-gray-600 hidden sm:table-cell">학교/학년</th>
                     <th className="px-4 py-3 font-semibold text-gray-600">출결</th>
                   </tr>
                 </thead>
@@ -179,8 +179,11 @@ export default function DashboardClient({
                     const statusInfo = att ? ATTENDANCE_LABEL[att.status] : null;
                     return (
                       <tr key={student.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                        <td className="px-4 py-3 font-bold text-gray-900">{student.name}</td>
-                        <td className="px-4 py-3 text-gray-600">
+                        <td className="px-4 py-3 font-bold text-gray-900">
+                          {student.name}
+                          <p className="sm:hidden text-xs font-normal text-gray-500 mt-0.5">{student.school} {student.grade}학년</p>
+                        </td>
+                        <td className="px-4 py-3 text-gray-600 hidden sm:table-cell">
                           {student.school} {student.grade}학년
                         </td>
                         <td className="px-4 py-3">
@@ -206,7 +209,7 @@ export default function DashboardClient({
 
       {/* 상세 보기 모달 */}
       {selectedTodo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setSelectedTodo(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setSelectedTodo(null)}>
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden" onClick={(e) => e.stopPropagation()}>
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
               <h3 className="text-lg font-bold text-gray-900">업무 상세</h3>
@@ -234,7 +237,7 @@ export default function DashboardClient({
 
       {/* 새 업무 지시 모달 */}
       {isTaskModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
               <h3 className="text-lg font-bold text-gray-900">새 업무 지시</h3>

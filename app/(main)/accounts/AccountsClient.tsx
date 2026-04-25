@@ -17,21 +17,22 @@ export default function AccountsClient({ users }: { users: User[] }) {
   const [state, action, pending] = useActionState(createAccount, undefined);
 
   return (
-    <main className="p-8">
-      <div className="flex justify-between items-center mb-8">
+    <main className="p-4 sm:p-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 tracking-tight">계정 관리</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 tracking-tight">계정 관리</h1>
           <p className="text-sm text-gray-500 mt-1">강사 및 조교 계정을 관리합니다.</p>
         </div>
         <button
           onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-semibold rounded-lg transition-colors shadow-sm"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-semibold rounded-lg transition-colors shadow-sm self-start sm:self-auto"
         >
           + 새 계정 생성
         </button>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      {/* 데스크톱 테이블 */}
+      <div className="hidden sm:block bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         <table className="w-full text-left text-sm">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
@@ -76,9 +77,39 @@ export default function AccountsClient({ users }: { users: User[] }) {
         </table>
       </div>
 
+      {/* 모바일 카드 목록 */}
+      <div className="sm:hidden space-y-3">
+        {users.length === 0 ? (
+          <div className="py-12 text-center text-gray-500 bg-white rounded-2xl border border-gray-200">
+            등록된 계정이 없습니다.
+          </div>
+        ) : (
+          users.map((user) => (
+            <div key={user.id} className="bg-white rounded-xl border border-gray-200 p-4">
+              <div className="flex items-center justify-between mb-1">
+                <p className="font-bold text-gray-900">{user.name}</p>
+                <span
+                  className={`px-2.5 py-1 rounded-md text-xs font-semibold border ${
+                    user.role === "TEACHER"
+                      ? "bg-purple-100 text-purple-700 border-purple-200"
+                      : "bg-blue-100 text-blue-700 border-blue-200"
+                  }`}
+                >
+                  {user.role === "TEACHER" ? "강사" : "조교"}
+                </span>
+              </div>
+              <p className="text-xs text-gray-500">{user.email}</p>
+              <p className="text-xs text-gray-400 mt-1">
+                생성: {user.createdBy?.name ?? "—"} · {new Date(user.createdAt).toLocaleDateString("ko-KR")}
+              </p>
+            </div>
+          ))
+        )}
+      </div>
+
       {/* 계정 생성 모달 */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
               <h3 className="text-lg font-bold text-gray-900">새 계정 생성</h3>

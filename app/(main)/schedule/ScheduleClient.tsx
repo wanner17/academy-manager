@@ -83,15 +83,15 @@ export default function ScheduleClient({
   today.setHours(0, 0, 0, 0);
 
   return (
-    <main className="p-8">
-      <div className="flex justify-between items-center mb-6">
+    <main className="p-4 sm:p-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 tracking-tight">주간 일정표</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 tracking-tight">주간 일정표</h1>
           <p className="text-sm text-gray-500 mt-1">
             {formatDate(weekDates[0])} – {formatDate(weekDates[6])}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={goToday}
             className="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -121,57 +121,59 @@ export default function ScheduleClient({
         </div>
       </div>
 
-      {/* 주간 그리드 */}
-      <div className="grid grid-cols-7 gap-3">
-        {weekDates.map((date, i) => {
-          const isToday = date.getTime() === today.getTime();
-          const daySchedules = getSchedulesForDay(date);
-          return (
-            <div key={i} className="flex flex-col">
-              <div
-                className={`text-center py-2 mb-2 rounded-lg text-sm font-semibold ${
-                  isToday
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-600"
-                }`}
-              >
-                <div>{DAYS[i]}</div>
-                <div className={`text-xs font-normal mt-0.5 ${isToday ? "text-blue-100" : "text-gray-400"}`}>
-                  {formatDate(date)}
+      {/* 주간 그리드 - 모바일에서 가로 스크롤 */}
+      <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+        <div className="grid grid-cols-7 gap-2 sm:gap-3 min-w-[560px]">
+          {weekDates.map((date, i) => {
+            const isToday = date.getTime() === today.getTime();
+            const daySchedules = getSchedulesForDay(date);
+            return (
+              <div key={i} className="flex flex-col">
+                <div
+                  className={`text-center py-2 mb-2 rounded-lg text-sm font-semibold ${
+                    isToday
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-100 text-gray-600"
+                  }`}
+                >
+                  <div>{DAYS[i]}</div>
+                  <div className={`text-xs font-normal mt-0.5 ${isToday ? "text-blue-100" : "text-gray-400"}`}>
+                    {formatDate(date)}
+                  </div>
+                </div>
+                <div className="space-y-2 min-h-32">
+                  {daySchedules.map((s) => (
+                    <div
+                      key={s.id}
+                      className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-xs group relative"
+                    >
+                      <p className="font-semibold text-blue-800 truncate">{s.title}</p>
+                      <p className="text-blue-600 mt-0.5">
+                        {formatTime(s.start)} – {formatTime(s.end)}
+                      </p>
+                      {s.room && <p className="text-blue-500 truncate">{s.room}</p>}
+                      <p className="text-blue-400 truncate">{s.teacher.name}</p>
+                      {session.role === "TEACHER" && (
+                        <button
+                          onClick={() => handleDelete(s.id)}
+                          disabled={deletingId === s.id}
+                          className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-blue-300 hover:text-red-500 transition-all text-xs font-bold"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div className="space-y-2 min-h-32">
-                {daySchedules.map((s) => (
-                  <div
-                    key={s.id}
-                    className="bg-blue-50 border border-blue-200 rounded-lg p-2 text-xs group relative"
-                  >
-                    <p className="font-semibold text-blue-800 truncate">{s.title}</p>
-                    <p className="text-blue-600 mt-0.5">
-                      {formatTime(s.start)} – {formatTime(s.end)}
-                    </p>
-                    {s.room && <p className="text-blue-500 truncate">{s.room}</p>}
-                    <p className="text-blue-400 truncate">{s.teacher.name}</p>
-                    {session.role === "TEACHER" && (
-                      <button
-                        onClick={() => handleDelete(s.id)}
-                        disabled={deletingId === s.id}
-                        className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 text-blue-300 hover:text-red-500 transition-all text-xs font-bold"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
 
       {/* 일정 추가 모달 */}
       {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
               <h3 className="text-lg font-bold text-gray-900">일정 추가</h3>

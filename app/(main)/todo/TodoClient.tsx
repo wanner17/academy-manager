@@ -66,10 +66,10 @@ export default function TodoClient({
   }
 
   return (
-    <main className="p-8">
-      <div className="flex justify-between items-center mb-6">
+    <main className="p-4 sm:p-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 tracking-tight">업무 체크리스트</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 tracking-tight">업무 체크리스트</h1>
           <p className="text-sm text-gray-500 mt-1">
             미완료 {pendingCount}건 · 완료 {completedCount}건
           </p>
@@ -77,7 +77,7 @@ export default function TodoClient({
         {session.role === "TEACHER" && (
           <button
             onClick={() => setIsAddOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-semibold rounded-lg transition-colors shadow-sm"
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-semibold rounded-lg transition-colors shadow-sm self-start sm:self-auto"
           >
             + 새 업무
           </button>
@@ -160,7 +160,7 @@ export default function TodoClient({
 
       {/* 상세 보기 모달 */}
       {selectedTodo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm" onClick={() => setSelectedTodo(null)}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" onClick={() => setSelectedTodo(null)}>
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden" onClick={(e) => e.stopPropagation()}>
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
               <h3 className="text-lg font-bold text-gray-900">업무 상세</h3>
@@ -196,7 +196,7 @@ export default function TodoClient({
 
       {/* 업무 추가 모달 */}
       {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
               <h3 className="text-lg font-bold text-gray-900">새 업무 추가</h3>

@@ -8,7 +8,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-900">
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm px-4 sm:px-0">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-white tracking-tight">학원 관리 시스템</h1>
           <p className="text-slate-400 text-sm mt-1">로그인하여 계속하세요</p>

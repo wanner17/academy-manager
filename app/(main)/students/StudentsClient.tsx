@@ -48,15 +48,15 @@ export default function StudentsClient({
   );
 
   return (
-    <main className="p-8">
-      <div className="flex justify-between items-center mb-8">
+    <main className="p-4 sm:p-8">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 sm:mb-8 gap-3">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 tracking-tight">학생 관리</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 tracking-tight">학생 관리</h1>
           <p className="text-sm text-gray-500 mt-1">등록된 학생 정보를 관리합니다.</p>
         </div>
         <button
           onClick={() => setIsAddOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-semibold rounded-lg transition-colors shadow-sm"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 text-sm font-semibold rounded-lg transition-colors shadow-sm self-start sm:self-auto"
         >
           + 학생 등록
         </button>
@@ -68,11 +68,12 @@ export default function StudentsClient({
           placeholder="이름, 학교, 연락처 검색..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full max-w-sm border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full sm:max-w-sm border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+      {/* 데스크톱 테이블 */}
+      <div className="hidden sm:block bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
         <table className="w-full text-left text-sm">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
@@ -112,9 +113,7 @@ export default function StudentsClient({
                     </td>
                     <td className="px-6 py-4">
                       {lastAttendance ? (
-                        <span
-                          className={`px-2.5 py-1 rounded-md text-xs font-semibold border ${STATUS_COLOR[lastAttendance.status]}`}
-                        >
+                        <span className={`px-2.5 py-1 rounded-md text-xs font-semibold border ${STATUS_COLOR[lastAttendance.status]}`}>
                           {STATUS_LABEL[lastAttendance.status]}
                         </span>
                       ) : (
@@ -129,9 +128,49 @@ export default function StudentsClient({
         </table>
       </div>
 
+      {/* 모바일 카드 목록 */}
+      <div className="sm:hidden space-y-3">
+        {filtered.length === 0 ? (
+          <div className="py-12 text-center text-gray-500 bg-white rounded-2xl border border-gray-200">
+            등록된 학생이 없습니다.
+          </div>
+        ) : (
+          filtered.map((student) => {
+            const lastLog = student.logs[0];
+            const lastAttendance = student.attendance[0];
+            return (
+              <div
+                key={student.id}
+                onClick={() => setSelected(student)}
+                className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between cursor-pointer active:bg-gray-50"
+              >
+                <div className="flex-1 min-w-0">
+                  <p className="font-bold text-gray-900">{student.name}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{student.school} {student.grade}학년 · {student.phone}</p>
+                  {lastLog && (
+                    <p className="text-xs text-gray-400 mt-0.5">
+                      상담: {new Date(lastLog.createdAt).toLocaleDateString("ko-KR")}
+                    </p>
+                  )}
+                </div>
+                <div className="ml-3 shrink-0">
+                  {lastAttendance ? (
+                    <span className={`px-2.5 py-1 rounded-md text-xs font-semibold border ${STATUS_COLOR[lastAttendance.status]}`}>
+                      {STATUS_LABEL[lastAttendance.status]}
+                    </span>
+                  ) : (
+                    <span className="text-gray-400 text-xs">미기록</span>
+                  )}
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
       {/* 학생 등록 모달 */}
       {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
               <h3 className="text-lg font-bold text-gray-900">학생 등록</h3>
@@ -216,8 +255,8 @@ export default function StudentsClient({
 
       {/* 학생 상세 모달 */}
       {selected && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center shrink-0">
               <div>
                 <h3 className="text-lg font-bold text-gray-900">{selected.name}</h3>
@@ -245,9 +284,7 @@ export default function StudentsClient({
                         <span className="text-gray-500">
                           {new Date(a.date).toLocaleDateString("ko-KR", { month: "numeric", day: "numeric" })}
                         </span>
-                        <span
-                          className={`px-2 py-0.5 rounded-md font-semibold border ${STATUS_COLOR[a.status]}`}
-                        >
+                        <span className={`px-2 py-0.5 rounded-md font-semibold border ${STATUS_COLOR[a.status]}`}>
                           {STATUS_LABEL[a.status]}
                         </span>
                       </div>
@@ -294,10 +331,7 @@ export default function StudentsClient({
                 ) : (
                   <div className="space-y-2">
                     {selected.logs.map((log) => (
-                      <div
-                        key={log.id}
-                        className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg"
-                      >
+                      <div key={log.id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                         <span className="text-xs text-gray-400 shrink-0 pt-0.5">
                           {new Date(log.createdAt).toLocaleDateString("ko-KR")}
                         </span>
